@@ -1,0 +1,12 @@
+name: discounting-shiny
+title: discounting-shiny
+username:
+account: paulstillman
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3829204
+bundleId: 4377489
+url: https://paulstillman.shinyapps.io/discounting-shiny/
+when: 1616366822.40532
+asMultiple: FALSE
+asStatic: FALSE
