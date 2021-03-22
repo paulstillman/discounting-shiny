@@ -5,7 +5,7 @@ library(patchwork)
 ui <- fluidPage(
     
     # Application title
-    titlePanel("Prospect Theory Parameters"),
+    titlePanel("Models of Discounting"),
     
     sidebarLayout(
         sidebarPanel(
