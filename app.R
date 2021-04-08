@@ -62,29 +62,54 @@ ui <- fluidPage(
     
     fluidRow(
         column(3,
-               h4("Exponential"),
-               withMathJax(
-                   '$$\\frac{1}{(1 + r)^D}$$'),
+               h3(checkboxInput('include_exponential', 'Exponential', value = TRUE)),
+        ),
+        column(3,
+               h3(checkboxInput('include_hyperbolic', "Hyperbolic", value = TRUE)),
+        ),
+        column(3,
+               h3(checkboxInput('include_quasi', 'Quasi-Hyperbolic', value = TRUE)),
+        ),
+        column(3,
+               # h4("Constant-Sensitivity"),
+               h3(checkboxInput('include_constant', 'Constant-Sensitivity', value = TRUE)),
+        )
+    ),
+    
+    fluidRow(
+        column(3,
+               withMathJax('$$e^{-r \\cdot D}$$'),
+        ),
+        column(3,
+               withMathJax('$$\\frac{1}{1 + k \\cdot D}$$'),
+        ),
+        column(3,
+               withMathJax('$$\\beta \\cdot \\delta^D$$'),
+        ),
+        column(3,
+               withMathJax('$$ e^{-(a \\cdot D)^b}$$'),
+               # checkboxInput('include_constant', 'Include', value = TRUE)
+        )
+    ),
+    
+    fluidRow(
+        column(3,
                numericInput("r",
                             "Exponential Discount Rate (r):",
                             min = 0,
                             max = 1,
                             value = .01,
-                            step = .001),               
-               checkboxInput('include_exponential', 'Include', value = TRUE)
+                            step = .001)               
         ),
         column(3,
-               h4("Hyperbolic"),
                numericInput("k",
                             "Hyperbolic Discount Rate (k)",
                             min = 0,
                             max = 1,
                             value = .01,
-                            step = .001),
-               checkboxInput('include_hyperbolic', 'Include', value = TRUE)
+                            step = .001)
         ),
         column(3,
-               h4("Quasi-Hyperbolic"),
                numericInput("beta",
                             "beta",
                             min = 0,
@@ -96,11 +121,9 @@ ui <- fluidPage(
                             min = 0,
                             max = 1,
                             value = .98,
-                            step = .001),
-               checkboxInput('include_quasi', 'Include', value = TRUE)
+                            step = .001)
         ),
         column(3,
-               h4("Constant-Sensitivity"),
                numericInput("a",
                             "a",
                             min = 0,
@@ -113,9 +136,10 @@ ui <- fluidPage(
                             max = 10,
                             value = 1,
                             step = .05),
-               checkboxInput('include_constant', 'Include', value = TRUE)
         )
     ),
+    
+    
     hr(),
     
     plotOutput("model_plot")
@@ -126,7 +150,7 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     calc_exponential <- function(V, D, r) {
-        V / (1 + r)^D
+        V / exp(r*D)
     }
     
     # hyperbolic
@@ -149,16 +173,27 @@ server <- function(input, output) {
     stat_cs <- reactive(stat_function(mapping = aes(color = 'Constant Sensitivity'), fun = constant_sensitivity, size = 1.5, args = list(V = 100, a = input$a, b = input$b), alpha = .5))
     
     output$model_plot <- renderPlot({
-        ggplot(data.frame(x=c(0, 360)), aes(x = x)) +
-            stat_exponential() +
-            stat_hyperbolic() +
-            stat_quasihyp() + 
-            stat_cs() +
+        
+        # stat_exponential <- reactive(stat_function(mapping = aes(color = 'Exponential'), fun = calc_exponential, size = 1.5, args = list(V = 100, r = input$r), alpha = .5))
+        # stat_hyperbolic <- reactive(stat_function(mapping = aes(color = 'Hyperbolic'), fun = calc_hyperbolic, size = 1.5, args = list(V = 100, k = input$k), alpha = .5))
+        # stat_quasihyp <- reactive(stat_function(mapping = aes(color = 'Quasi-Hyperbolic'), fun = calc_quasi_hyperbolic, size = 1.5, args = list(V = 100, beta = input$beta, delta = input$delta), alpha = .5))
+        # stat_cs <- reactive(stat_function(mapping = aes(color = 'Constant Sensitivity'), fun = constant_sensitivity, size = 1.5, args = list(V = 100, a = input$a, b = input$b), alpha = .5))
+        
+        
+        p_base <- ggplot(data.frame(x=c(0, 360)), aes(x = x)) +
             scale_x_continuous('Delay of Reward (D)') +
             scale_y_continuous('Present-Day Value') +
             theme_bw() +
-            theme(text = element_text(size = 16, face = 'bold')) +
+            theme(text = element_text(size = 16, face = 'bold'),
+                  legend.position = 'right') +
             labs(title = 'Hyperbolic Discounting: Value of $100 as a function of delay (D) for different discount models')
+        
+        if(input$include_exponential) p_base <- p_base + stat_exponential()
+        if(input$include_hyperbolic) p_base <- p_base + stat_hyperbolic()
+        if(input$include_quasi) p_base <- p_base + stat_quasihyp()
+        if(input$include_constant) p_base <- p_base + stat_cs()
+        
+        p_base + scale_color_manual(values = c('Exponential' = rainbow(4)[1], 'Hyperbolic' = rainbow(4)[2], 'Quasi-Hyperbolic' = rainbow(4)[3], 'Constant Sensitivity' = rainbow(4)[4]))
         
     })
     
