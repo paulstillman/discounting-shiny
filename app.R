@@ -95,7 +95,7 @@ ui <- fluidPage(
     fluidRow(
         column(3,
                numericInput("r",
-                            "Exponential Discount Rate (r):",
+                            "Exponential Discount Rate (r)",
                             min = 0,
                             max = 1,
                             value = .01,
