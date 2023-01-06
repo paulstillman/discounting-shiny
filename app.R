@@ -142,7 +142,8 @@ ui <- fluidPage(
     
     hr(),
     
-    plotOutput("model_plot")
+    plotOutput("model_plot"),
+    numericInput("D", "D", min = 0, max = 300, value = 150, step = 10)
     
 )
 
@@ -180,9 +181,9 @@ server <- function(input, output) {
         # stat_cs <- reactive(stat_function(mapping = aes(color = 'Constant Sensitivity'), fun = constant_sensitivity, size = 1.5, args = list(V = 100, a = input$a, b = input$b), alpha = .5))
         
         
-        p_base <- ggplot(data.frame(x=c(0, 360)), aes(x = x)) +
+        p_base <- ggplot(data.frame(x=c(0, input$D)), aes(x = x)) +
             scale_x_continuous('Delay of Reward (D)') +
-            scale_y_continuous('Present-Day Value') +
+            scale_y_continuous('Present-Day Value', limits = c(0,100)) +
             theme_bw() +
             theme(text = element_text(size = 16, face = 'bold'),
                   legend.position = 'right') +
