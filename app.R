@@ -128,13 +128,13 @@ ui <- fluidPage(
                             "a",
                             min = 0,
                             max = 100,
-                            value = .5,
-                            step = .25),
+                            value = .01,
+                            step = .001),
                numericInput("b",
                             "b",
                             min = 0,
                             max = 10,
-                            value = 1,
+                            value = 1.5,
                             step = .05),
         )
     ),
@@ -186,14 +186,14 @@ server <- function(input, output) {
             theme_bw() +
             theme(text = element_text(size = 16, face = 'bold'),
                   legend.position = 'right') +
-            labs(title = 'Hyperbolic Discounting: Value of $100 as a function of delay (D) for different discount models')
+            labs(title = 'Value of $100 as a function of delay (D)\nfor different discount models')
         
         if(input$include_exponential) p_base <- p_base + stat_exponential()
         if(input$include_hyperbolic) p_base <- p_base + stat_hyperbolic()
         if(input$include_quasi) p_base <- p_base + stat_quasihyp()
         if(input$include_constant) p_base <- p_base + stat_cs()
         
-        p_base + scale_color_manual(values = c('Exponential' = rainbow(4)[1], 'Hyperbolic' = rainbow(4)[2], 'Quasi-Hyperbolic' = rainbow(4)[3], 'Constant Sensitivity' = rainbow(4)[4]))
+        p_base + scale_color_manual("Model", values = c('Exponential' = rainbow(4)[1], 'Hyperbolic' = rainbow(4)[2], 'Quasi-Hyperbolic' = rainbow(4)[3], 'Constant Sensitivity' = rainbow(4)[4]))
         
     })
     
